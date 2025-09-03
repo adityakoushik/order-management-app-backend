@@ -27,4 +27,7 @@ Route::middleware(['auth', 'role:superadmin'])->prefix('admin')->name('admin.')-
 
 
 
+
+
+
 require __DIR__ . '/auth.php';
