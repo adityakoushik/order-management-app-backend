@@ -17,7 +17,15 @@ class User extends Authenticatable
 		'phone',
 		'role',
 		'password',
+		'parent_admin_id'
 	];
+
+
+	// New relationship method
+	public function parentAdmin()
+	{
+		return $this->belongsTo(User::class, 'parent_admin_id');
+	}
 
 	protected $hidden = [
 		'password',

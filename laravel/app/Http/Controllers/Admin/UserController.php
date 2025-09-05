@@ -19,8 +19,10 @@ class UserController extends Controller
 
 	public function create()
 	{
+		// GET admin data
+		$admins = User::where('role', 'admin')->get();
 		// Logic to show user creation form
-		return view('admin.users.create');
+		return view('admin.users.create', compact('admins'));
 	}
 
 	public function store(Request $request)
@@ -37,7 +39,8 @@ class UserController extends Controller
 			'name' => $request->name,
 			'phone' => $request->phone,
 			'password' => Hash::make($request->password),
-			'role' => $request->role
+			'role' => $request->role,
+			'parent_admin_id' => $request->role === 'customer' ? $request->parent_admin_id : null,
 		]);
 
 		return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
@@ -46,7 +49,8 @@ class UserController extends Controller
 
 	public function edit(User $user)
 	{
-		return view('admin.users.edit', compact('user'));
+		$admins = User::where('role', 'admin')->get();
+		return view('admin.users.edit', compact('user', 'admins'));
 	}
 
 	public function update(Request $request, User $user)
@@ -64,6 +68,7 @@ class UserController extends Controller
 			$user->password = Hash::make($request->password);
 		}
 		$user->role = $request->role;
+		$user->parent_admin_id = $request->role === 'customer' ? $request->parent_admin_id : null;
 		$user->save();
 
 		return redirect()->route('admin.users.index')->with('success', 'User updated successfully!');
