@@ -5,28 +5,25 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
-	/**
-	 * Run the migrations.
-	 */
 	public function up(): void
 	{
 		Schema::create('products', function (Blueprint $table) {
 			$table->id();
+			$table->unsignedBigInteger('admin_id'); // which admin uploaded it
 			$table->string('name');
 			$table->text('desc')->nullable();
-			$table->string('image');               // path to webp image
-			$table->string('thumb')->nullable();   // path to webp thumbnail
-			$table->boolean('status')->default(true);
+			$table->string('image')->nullable();
+			$table->string('thumb')->nullable();
+			$table->enum('status', ['active', 'inactive'])->default('active');
 			$table->timestamps();
-			$table->index('name');
+
+			$table->foreign('admin_id')->references('id')->on('users')->onDelete('cascade');
 		});
 	}
 
-	/**
-	 * Reverse the migrations.
-	 */
 	public function down(): void
 	{
 		Schema::dropIfExists('products');
 	}
+
 };
