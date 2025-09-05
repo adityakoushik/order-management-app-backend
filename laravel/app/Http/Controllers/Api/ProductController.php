@@ -18,10 +18,33 @@ class ProductController extends Controller
 	// list with pagination
 	public function index(Request $request)
 	{
+		$loggedInUser = $request->user();
+
 		$perPage = (int) $request->query('per_page', 20);
-		$products = Product::latest()->paginate($perPage);
-		$products->getCollection()->transform(fn($p) => $this->withUrls($p));
+
+		// If customer -> fetch only parent admin's products
+		if ($loggedInUser->role === 'customer' && $loggedInUser->parent_admin_id) {
+			$products = Product::where('admin_id', $loggedInUser->parent_admin_id)
+				->latest()
+				->paginate($perPage);
+		} elseif ($loggedInUser->role === 'admin') {
+			// If admin -> fetch only their products
+			$products = Product::where('admin_id', $loggedInUser->id)
+				->latest()
+				->paginate($perPage);
+		} else {
+			// Fallback: fetch all products (for super-admin or undefined roles)
+			$products = Product::latest()->paginate($perPage);
+			// $products = Product::whereNull('id')->paginate($perPage);
+		}
+
+		// Transform each product with URLs
+		$products->getCollection()->transform(function ($product) {
+			return $this->withUrls($product);
+		});
+
 		return response()->json($products);
+
 	}
 
 	// store product (single image)
@@ -36,6 +59,7 @@ class ProductController extends Controller
 			'image' => $paths['image'],
 			'thumb' => $paths['thumb'],
 			'status' => $request->boolean('status', true),
+			'admin_id' => $request->user()->id, //current logged in admin
 		]);
 
 		return response()->json([
