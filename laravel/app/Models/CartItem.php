@@ -1,0 +1,30 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class CartItem extends Model
+{
+	protected $fillable = [
+		'cart_id',
+		'product_id',
+		'qty',
+		'price',
+		'meta' // size or color. this will be a josn field
+	];
+
+	protected $casts = [
+		'meta' => 'array'
+	];
+
+	public function cart()
+	{
+		return $this->belongsTo(Cart::class);
+	}
+
+	public function product()
+	{
+		return $this->belongsTo(Product::class);
+	}
+}

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -25,5 +26,11 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::match(['put', 'patch'], '/products/{product}', [ProductController::class, 'update']);
 	Route::delete('/products/{product}', [ProductController::class, 'destroy']);
 
+	// Cart routes
+	Route::get('/cart', [CartController::class, 'index']); // fetch cart
+	Route::post('/cart/items', [CartController::class, 'store']); // add/increment
+	Route::put('/cart/items/{item}', [CartController::class, 'update']); // set qty
+	Route::delete('/cart/items/{item}', [CartController::class, 'destroy']);// remove
+	Route::delete('/cart', [CartController::class, 'clear']); // clear cart
 
 });
