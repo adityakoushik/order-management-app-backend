@@ -8,7 +8,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Cart;
 use Illuminate\Support\Facades\DB;
-use Request;
+use Illuminate\Http\Request;
 
 class CheckoutController extends Controller
 {
