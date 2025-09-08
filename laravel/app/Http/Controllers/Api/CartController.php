@@ -19,6 +19,14 @@ class CartController extends Controller
 	public function index(Request $request)
 	{
 		$cart = $this->userCart($request)->load(['items.product']);
+
+		// Apply the same transformation as ProductController->withUrls(...)
+		foreach ($cart->items as $item) {
+			if ($item->product) {
+				$item->product = $this->withUrls($item->product); // adds image_url, thumb_url
+			}
+		}
+
 		return response()->json(['status' => 'success', 'data' => $cart]);
 	}
 
@@ -74,5 +82,19 @@ class CartController extends Controller
 		abort_unless($item->cart_id === $cart->id, 403, 'Forbidden');
 	}
 
+	/**
+	 * Add image_url and thumb_url to the product.
+	 */
+	protected function withUrls($product)
+	{
+		if (!$product)
+			return $product;
+
+		// \Log::info('CartController withUrls thumb value', ['thumb' => $product->thumb]);
+		$product->image_url = $product->image ? asset('storage/' . $product->image) : null;
+		$product->thumb_url = $product->thumb ? asset('storage/' . $product->thumb) : null;
+
+		return $product;
+	}
 
 }
