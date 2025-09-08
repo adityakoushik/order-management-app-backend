@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Cart;
 use Illuminate\Support\Facades\DB;
+use Request;
 
 class CheckoutController extends Controller
 {
@@ -78,10 +79,10 @@ class CheckoutController extends Controller
 		return 'ORD-' . now()->format('Ymd-His') . '-' . str_pad((string) (Order::max('id') + 1), 4, '0', STR_PAD_LEFT);
 	}
 
-	public function myOrders(AddCheckoutRequest $r) // or Request if not validating here
+	public function myOrders(Request $request) // or Request if not validating here
 	{
 		$orders = Order::with('items.product')
-			->where('user_id', $r->user()->id)
+			->where('user_id', $request->user()->id)
 			->latest()
 			->get();
 
