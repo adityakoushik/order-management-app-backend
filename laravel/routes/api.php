@@ -10,7 +10,9 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // })->middleware('auth:sanctum');
 
+
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\OrderManagementController;
 
 
 Route::post('/login', [AuthController::class, 'login']);
@@ -37,5 +39,10 @@ Route::middleware('auth:sanctum')->group(function () {
 	// Checkout routes
 	Route::post('/checkout', [CheckoutController::class, 'checkout']);
 	Route::get('/myorders', [CheckoutController::class, 'myOrders']);
+
+	// Admin Order management routes
+	Route::get('/orders/grouped-by-customer', [OrderManagementController::class, 'groupedByCustomer']);
+	Route::post('/orders/{order}/approve', [OrderManagementController::class, 'approve'])->name('orders.approve');
+	Route::post('/orders/{order}/reject', [OrderManagementController::class, 'reject'])->name('orders.reject');
 
 });
