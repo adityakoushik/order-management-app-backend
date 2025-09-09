@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Events\OrderStatusUpdated;
 use Illuminate\Http\Request;
 
 class OrderManagementController extends Controller
@@ -65,7 +66,10 @@ class OrderManagementController extends Controller
 			return response()->json(['message' => 'Order already processed'], 400);
 		}
 
+
 		$order->update(['status' => 'approved']);
+		// Fire broadcast event for customer
+		event(new OrderStatusUpdated($order->id, 'approved', $order->user_id));
 
 		// return updated grouped list
 		$status = $request->query('status', 'all');
@@ -84,7 +88,10 @@ class OrderManagementController extends Controller
 			return response()->json(['message' => 'Order already processed'], 400);
 		}
 
+
 		$order->update(['status' => 'rejected']);
+		// Fire broadcast event for customer
+		event(new OrderStatusUpdated($order->id, 'rejected', $order->user_id));
 
 		// return updated grouped list
 		$status = $request->query('status', 'all');
