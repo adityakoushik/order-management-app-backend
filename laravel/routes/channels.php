@@ -14,5 +14,6 @@ use Illuminate\Support\Facades\Broadcast;
 */
 
 Broadcast::channel('orders.{customerId}', function ($user, $customerId) {
+	\Log::info('Broadcast auth', ['user_id' => $user->id, 'customerId' => $customerId]);
 	return (int) $user->id === (int) $customerId;
 });
