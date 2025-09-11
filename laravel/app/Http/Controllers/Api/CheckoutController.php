@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\OrderStatusUpdated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Checkout\AddCheckoutRequest;
 use App\Models\Order;
@@ -64,6 +65,9 @@ class CheckoutController extends Controller
 
 			// Clear cart after creating order items
 			$cart->items()->delete();
+
+			// ✅ Fire event after order creation
+			event(new OrderStatusUpdated($order->id, 'pending', $user->id));
 
 			return $order->load('items');
 		});

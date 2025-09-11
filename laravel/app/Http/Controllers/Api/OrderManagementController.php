@@ -72,12 +72,12 @@ class OrderManagementController extends Controller
 	public function update(Request $request, Order $order)
 	{
 
-		\Log::info('Update order attempt', [
-			'order_id' => $order->id,
-			'status' => $order->status,
-			'user_id' => $order->user_id,
-			'auth_id' => auth()->id(),
-		]);
+		// \Log::info('Update order attempt', [
+		// 	'order_id' => $order->id,
+		// 	'status' => $order->status,
+		// 	'user_id' => $order->user_id,
+		// 	'auth_id' => auth()->id(),
+		// ]);
 
 		// 1. Ownership check
 		if ($order->user_id !== auth()->id()) {
