@@ -43,11 +43,15 @@ class OrderStatusUpdated implements ShouldBroadcast
 	 */
 	public function broadcastOn()
 	{
-		// Log::info('OrderStatusUpdated broadcastOn', [
-		// 	'channel' => 'orders.' . $this->customerId,
-		// ]);
 		// Each customer listens on their own private channel
-		return new PrivateChannel('orders.' . $this->customerId);
+		// return new PrivateChannel('orders.' . $this->customerId);
+		return [
+			// 🔑 Customer private channel
+			new PrivateChannel("customer.{$this->customerId}"),
+
+			// 🔑 Admin private channel (all admins should subscribe to this)
+			new PrivateChannel("admin"),
+		];
 	}
 
 	/**

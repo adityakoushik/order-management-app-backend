@@ -12,8 +12,14 @@ use Illuminate\Support\Facades\Broadcast;
 | used to check if an authenticated user can listen to the channel.
 |
 */
-
+// Customer channel
 Broadcast::channel('orders.{customerId}', function ($user, $customerId) {
 	\Log::info('Broadcast auth', ['user_id' => $user->id, 'customerId' => $customerId]);
 	return (int) $user->id === (int) $customerId;
+});
+
+// Admin channel
+Broadcast::channel('admin', function ($user) {
+	// Allow only admins to listen
+	return $user->role === 'admin'; // adjust depending on your roles system
 });
