@@ -12,7 +12,13 @@ class OrderManagementController extends Controller
 	// 📌 Reusable method to get grouped orders
 	private function getGroupedOrders($status = null)
 	{
-		$ordersQuery = Order::with(['user', 'items.product']);
+		$admin = auth()->user();
+
+		// Get all users (customers) for this admin
+		$customerIds = \App\Models\User::where('parent_admin_id', $admin->id)->pluck('id');
+
+		$ordersQuery = Order::with(['user', 'items.product'])
+			->whereIn('user_id', $customerIds);
 
 		if ($status && strtolower($status) !== 'all') {
 			$ordersQuery->where('status', $status);
