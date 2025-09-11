@@ -33,6 +33,5 @@ return [
 			'driver' => 'null',
 		],
 	],
-	// Add this section:
 	'guard' => 'api',
 ];

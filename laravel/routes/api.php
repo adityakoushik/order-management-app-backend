@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CheckoutController;
 use App\Http\Controllers\Api\ProductController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 
 // Route::get('/user', function (Request $request) {
@@ -16,6 +17,8 @@ use App\Http\Controllers\Api\OrderManagementController;
 
 
 Route::post('/login', [AuthController::class, 'login']);
+
+Broadcast::routes(['middleware' => ['auth:sanctum']]);
 
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -44,5 +47,6 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::get('/orders/grouped-by-customer', [OrderManagementController::class, 'groupedByCustomer']);
 	Route::post('/orders/{order}/approve', [OrderManagementController::class, 'approve'])->name('orders.approve');
 	Route::post('/orders/{order}/reject', [OrderManagementController::class, 'reject'])->name('orders.reject');
+
 
 });
