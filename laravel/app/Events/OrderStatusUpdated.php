@@ -28,11 +28,11 @@ class OrderStatusUpdated implements ShouldBroadcast
 		$this->status = $status;
 		$this->customerId = $customerId;
 
-		Log::info('OrderStatusUpdated event constructed', [
-			'orderId' => $orderId,
-			'status' => $status,
-			'customerId' => $customerId,
-		]);
+		// Log::info('OrderStatusUpdated event constructed', [
+		// 	'orderId' => $orderId,
+		// 	'status' => $status,
+		// 	'customerId' => $customerId,
+		// ]);
 
 	}
 
