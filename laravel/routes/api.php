@@ -15,10 +15,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\OrderManagementController;
 
-
+Broadcast::routes(['middleware' => ['auth:sanctum']]);
 Route::post('/login', [AuthController::class, 'login']);
 
-Broadcast::routes(['middleware' => ['auth:sanctum']]);
+
 
 Route::middleware('auth:sanctum')->group(function () {
 
