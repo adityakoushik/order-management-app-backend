@@ -71,13 +71,21 @@ class OrderManagementController extends Controller
 	// 📌 PUT /api/orders/{order}
 	public function update(Request $request, Order $order)
 	{
+
+		\Log::info('Update order attempt', [
+			'order_id' => $order->id,
+			'status' => $order->status,
+			'user_id' => $order->user_id,
+			'auth_id' => auth()->id(),
+		]);
+
 		// 1. Ownership check
 		if ($order->user_id !== auth()->id()) {
 			return response()->json(['message' => 'Unauthorized'], 403);
 		}
 
 		// 2. Only pending orders can be updated
-		if ($order->status !== 'pending') {
+		if (strtolower($order->status) !== 'pending') {
 			return response()->json(['message' => 'Order can only be updated while pending'], 400);
 		}
 
