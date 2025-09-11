@@ -55,7 +55,7 @@ class OrderStatusUpdated implements ShouldBroadcast
 	 */
 	public function broadcastAs()
 	{
-		// Log::info('OrderStatusUpdated broadcastAs');
+		Log::info('OrderStatusUpdated broadcastAs');
 		return 'OrderStatusUpdated';
 	}
 }
