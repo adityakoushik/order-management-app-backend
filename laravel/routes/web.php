@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminCustomerMapController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -23,6 +24,10 @@ Route::middleware(['auth', 'role:superadmin'])->prefix('admin')->name('admin.')-
 	Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
 	Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 	Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+	// Admin-Customer mapping route
+	Route::get('/admin-customer-map', [AdminCustomerMapController::class, 'index'])->name('customer.map');
+
 });
 
 

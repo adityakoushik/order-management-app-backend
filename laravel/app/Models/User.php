@@ -44,4 +44,10 @@ class User extends Authenticatable
 	{
 		return $this->hasOne(Cart::class);
 	}
+
+	// Admin → Customers (একজন admin এর অনেকগুলো customer থাকে)
+	public function customers()
+	{
+		return $this->hasMany(User::class, 'parent_admin_id');
+	}
 }

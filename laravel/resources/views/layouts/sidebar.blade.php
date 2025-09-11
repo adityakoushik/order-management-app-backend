@@ -29,6 +29,11 @@
 				User Management
 			</x-sidebar-nav-link>
 
+			<x-sidebar-nav-link href="{{ route('admin.customer.map') }}" :active="request()->routeIs('admin.customer.map')"
+				icon="fas fa-images">
+				Admin Customer Mapping
+			</x-sidebar-nav-link>
+
 
 
 		</nav>
