@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Events\OrderStatusUpdated;
+use App\Models\OrderItem;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class OrderManagementController extends Controller
 {
@@ -64,6 +66,68 @@ class OrderManagementController extends Controller
 
 		return response()->json($grouped);
 	}
+
+
+	// 📌 PUT /api/orders/{order}
+	public function update(Request $request, Order $order)
+	{
+		// 1. Ownership check
+		if ($order->user_id !== auth()->id()) {
+			return response()->json(['message' => 'Unauthorized'], 403);
+		}
+
+		// 2. Only pending orders can be updated
+		if ($order->status !== 'pending') {
+			return response()->json(['message' => 'Order can only be updated while pending'], 400);
+		}
+
+		// 3. Validate order-level fields
+		$validated = $request->validate([
+			'delivery_date' => ['nullable', 'date', 'after_or_equal:today'],
+			'notes' => ['nullable', 'string', 'max:500'],
+			'shipping_name' => ['nullable', 'string', 'max:255'],
+			'shipping_phone' => ['nullable', 'string', 'max:20'],
+			'shipping_address_1' => ['nullable', 'string', 'max:255'],
+			'shipping_address_2' => ['nullable', 'string', 'max:255'],
+			'shipping_city' => ['nullable', 'string', 'max:100'],
+			'shipping_state' => ['nullable', 'string', 'max:100'],
+			'shipping_postal_code' => ['nullable', 'string', 'max:20'],
+			'shipping_country' => ['nullable', 'string', 'max:100'],
+
+			// Order items
+			'items' => ['required', 'array', 'min:1'],
+			'items.*.id' => ['required', Rule::exists('order_items', 'id')->where('order_id', $order->id)],
+			'items.*.qty' => ['required', 'integer', 'min:1'],
+		]);
+
+		// 4. Update order details
+		$order->update([
+			'delivery_date' => $validated['delivery_date'] ?? $order->delivery_date,
+			'notes' => $validated['notes'] ?? $order->notes,
+			'shipping_name' => $validated['shipping_name'] ?? $order->shipping_name,
+			'shipping_phone' => $validated['shipping_phone'] ?? $order->shipping_phone,
+			'shipping_address_1' => $validated['shipping_address_1'] ?? $order->shipping_address_1,
+			'shipping_address_2' => $validated['shipping_address_2'] ?? $order->shipping_address_2,
+			'shipping_city' => $validated['shipping_city'] ?? $order->shipping_city,
+			'shipping_state' => $validated['shipping_state'] ?? $order->shipping_state,
+			'shipping_postal_code' => $validated['shipping_postal_code'] ?? $order->shipping_postal_code,
+			'shipping_country' => $validated['shipping_country'] ?? $order->shipping_country,
+		]);
+
+		// 5. Update items (qty)
+		foreach ($validated['items'] as $itemData) {
+			$item = OrderItem::where('order_id', $order->id)->where('id', $itemData['id'])->first();
+			if ($item) {
+				$item->update(['qty' => $itemData['qty']]);
+			}
+		}
+
+		return response()->json([
+			'message' => 'Order updated successfully',
+			'order' => $order->load('items.product'),
+		]);
+	}
+
 
 	// 📌 POST /api/orders/{order}/approve
 	public function approve(Request $request, Order $order)
