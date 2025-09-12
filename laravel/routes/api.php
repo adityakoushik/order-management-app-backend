@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\OrderManagementController;
 
 // Broadcast::routes(['middleware' => ['auth:sanctum']]);
 
+
 Route::post('/login', [AuthController::class, 'login']);
 
 
