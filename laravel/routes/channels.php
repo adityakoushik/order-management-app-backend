@@ -20,10 +20,3 @@ Broadcast::channel('customer.{customerId}', function ($user, $customerId) {
 	]);
 	return (int) optional($user)->id === (int) $customerId;
 });
-
-
-// Admin channel
-Broadcast::channel('admin', function ($user) {
-	// Allow only admins to listen
-	return $user->role === 'admin'; // adjust depending on your roles system
-});
