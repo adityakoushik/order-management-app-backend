@@ -14,9 +14,6 @@ use Illuminate\Support\Facades\Broadcast;
 */
 // Customer channel
 Broadcast::channel('customer.{customerId}', function ($user, $customerId) {
-	\Log::info('Broadcast auth attempt', [
-		'auth_user_id' => optional($user)->id,
-		'customerId' => $customerId,
-	]);
-	return (int) optional($user)->id === (int) $customerId;
+	\Log::info('Broadcast auth', ['user_id' => $user->id, 'customerId' => $customerId]);
+	return (int) $user->id === (int) $customerId;
 });
