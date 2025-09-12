@@ -146,6 +146,13 @@ class OrderManagementController extends Controller
 
 
 		$order->update(['status' => 'approved']);
+
+		\Log::info("Dispatching OrderStatusUpdated event", [
+			'order_id' => $order->id,
+			'status' => $order->status,
+			'customerId' => $order->customer_id,
+		]);
+
 		// Fire broadcast event for customer
 		event(new OrderStatusUpdated($order->id, 'approved', $order->user_id));
 
