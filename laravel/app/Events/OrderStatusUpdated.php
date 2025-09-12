@@ -28,12 +28,6 @@ class OrderStatusUpdated implements ShouldBroadcast
 		$this->status = $status;
 		$this->customerId = $customerId;
 
-		// Log::info('OrderStatusUpdated event constructed', [
-		// 	'orderId' => $orderId,
-		// 	'status' => $status,
-		// 	'customerId' => $customerId,
-		// ]);
-
 	}
 
 	/**
@@ -45,13 +39,6 @@ class OrderStatusUpdated implements ShouldBroadcast
 	{
 		// Each customer listens on their own private channel
 		return new PrivateChannel('customer.' . $this->customerId);
-		// return [
-		// 	// 🔑 Customer private channel
-		// 	new PrivateChannel("customer.{$this->customerId}"),
-
-		// 	// 🔑 Admin private channel (all admins should subscribe to this)
-		// 	new PrivateChannel("admin"),
-		// ];
 	}
 
 	/**
