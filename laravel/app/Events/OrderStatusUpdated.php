@@ -62,4 +62,14 @@ class OrderStatusUpdated implements ShouldBroadcast
 		Log::info('OrderStatusUpdated broadcastAs');
 		return 'OrderStatusUpdated';
 	}
+
+	public function broadcastWith()
+	{
+		return [
+			'order_id' => $this->orderId,
+			'status' => $this->status,
+			'customerId' => $this->customerId,
+		];
+	}
+
 }
