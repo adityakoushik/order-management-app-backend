@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AdminDashboardController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CheckoutController;
 use App\Http\Controllers\Api\ProductController;
@@ -19,9 +20,14 @@ use App\Http\Controllers\Api\OrderManagementController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
-
+// new customer registration route
+Route::post('/register-customer', [AuthController::class, 'registerCustomer']);
 
 Route::middleware('auth:sanctum')->group(function () {
+
+
+	// Admin Dashboard route
+	Route::get('/admin/dashboard', [AdminDashboardController::class, 'index']);
 
 	// Logout route
 	Route::post('/logout', [AuthController::class, 'logout']);

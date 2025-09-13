@@ -17,7 +17,8 @@ class User extends Authenticatable
 		'phone',
 		'role',
 		'password',
-		'parent_admin_id'
+		'parent_admin_id',
+		'referral_code',
 	];
 
 

@@ -9,6 +9,39 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+
+	public function registerCustomer(Request $request)
+	{
+		$request->validate([
+			'name' => 'required|string|max:255',
+			'phone' => 'required|string|max:20|unique:users',
+			'password' => 'required|string|min:6',
+			'referral_code' => 'required|string|exists:users,referral_code',
+		]);
+
+		// Find admin by referral code
+		$admin = User::where('referral_code', $request->referral_code)
+			->where('role', 'admin')
+			->firstOrFail();
+
+		$customer = User::create([
+			'name' => $request->name,
+			'phone' => $request->phone,
+			'password' => Hash::make($request->password),
+			'role' => 'customer',
+			'parent_admin_id' => $admin->id,
+		]);
+
+		$token = $customer->createToken('mobile-app-token')->plainTextToken;
+
+		return response()->json([
+			'message' => 'Customer registered successfully',
+			'user' => $customer,
+			'token' => $token,
+		]);
+	}
+
+
 	public function login(Request $request)
 	{
 

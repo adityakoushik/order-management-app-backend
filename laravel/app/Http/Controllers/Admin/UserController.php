@@ -35,12 +35,20 @@ class UserController extends Controller
 			'role' => 'required|in:admin,customer'
 		]);
 
+		$referralCode = null;
+		if ($request->role === 'admin') {
+
+			$referralCode = 'OMS' . strtoupper(bin2hex(random_bytes(4))); // 8 hex chars
+
+		}
+
 		User::create([
 			'name' => $request->name,
 			'phone' => $request->phone,
 			'password' => Hash::make($request->password),
 			'role' => $request->role,
 			'parent_admin_id' => $request->role === 'customer' ? $request->parent_admin_id : null,
+			'referral_code' => $referralCode,
 		]);
 
 		return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
