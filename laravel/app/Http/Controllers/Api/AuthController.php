@@ -13,8 +13,8 @@ class AuthController extends Controller
 	public function registerCustomer(Request $request)
 	{
 		$request->validate([
-			'name' => 'required|string|max:255',
-			'phone' => 'required|string|max:20|unique:users',
+			'name' => 'required|string|max:255|regex:/^[A-Za-z\s]+$/',
+			'phone' => 'required|string|regex:/^[0-9]{10}$/|unique:users',
 			'password' => 'required|string|min:6',
 			'referral_code' => 'required|string|exists:users,referral_code',
 		]);
