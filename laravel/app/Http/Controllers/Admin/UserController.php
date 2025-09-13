@@ -30,7 +30,7 @@ class UserController extends Controller
 		// Logic to store a new user
 		$request->validate([
 			'name' => 'required|string|max:255',
-			'phone' => 'required|string|max:20|unique:users',
+			'phone' => 'required|string|regex:/^[0-9]{10}$/|unique:users',
 			'password' => 'required|string|min:6',
 			'role' => 'required|in:admin,customer'
 		]);
@@ -38,7 +38,7 @@ class UserController extends Controller
 		$referralCode = null;
 		if ($request->role === 'admin') {
 
-			$referralCode = 'OMS' . strtoupper(bin2hex(random_bytes(4))); // 8 hex chars
+			$referralCode = 'OMS' . strtoupper(bin2hex(random_bytes(2))); // 8 hex chars
 
 		}
 
