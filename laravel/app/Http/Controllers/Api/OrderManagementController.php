@@ -187,4 +187,21 @@ class OrderManagementController extends Controller
 			'orders' => $grouped
 		]);
 	}
+
+	// 📌 GET /api/orders/{order}
+	public function show(Request $request, Order $order)
+	{
+		// Ownership check: customer can only view own order
+		if ($order->user_id !== auth()->id()) {
+			return response()->json(['message' => 'Unauthorized'], 403);
+		}
+
+		// Load items with product snapshot
+		$order->load('items.product');
+
+		return response()->json([
+			'order' => $order
+		]);
+	}
+
 }

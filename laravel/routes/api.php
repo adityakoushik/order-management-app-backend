@@ -55,6 +55,10 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::post('/orders/{order}/approve', [OrderManagementController::class, 'approve'])->name('orders.approve');
 	Route::post('/orders/{order}/reject', [OrderManagementController::class, 'reject'])->name('orders.reject');
 
+
+	// Customer fetch single order details
+	Route::get('/orders/{order}', [OrderManagementController::class, 'show'])->name('orders.show');
+
 	// Customer update order (only if pending)
 	Route::match(['put', 'patch'], '/orders/{order}', [OrderManagementController::class, 'update'])->name('orders.update');
 
