@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminCustomerMapController;
+use App\Http\Controllers\Admin\CustomerContoller;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -27,6 +28,9 @@ Route::middleware(['auth', 'role:superadmin'])->prefix('admin')->name('admin.')-
 
 	// Admin-Customer mapping route
 	Route::get('/admin-customer-map', [AdminCustomerMapController::class, 'index'])->name('customer.map');
+
+	// Get Customers
+	Route::get('/customers', [CustomerContoller::class, 'index'])->name('customers');
 
 });
 

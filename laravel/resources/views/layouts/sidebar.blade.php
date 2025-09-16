@@ -34,7 +34,10 @@
 				Admin Customer Mapping
 			</x-sidebar-nav-link>
 
-
+			<x-sidebar-nav-link href="{{ route('admin.customers') }}" :active="request()->routeIs('admin.customers')"
+				icon="fas fa-images">
+				Customers
+			</x-sidebar-nav-link>
 
 		</nav>
 	</div>
