@@ -6,21 +6,77 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Events\OrderStatusUpdated;
 use App\Models\OrderItem;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 class OrderManagementController extends Controller
 {
-	// 📌 Reusable method to get grouped orders
+	// Reusable method to get grouped orders
+	// private function getGroupedOrders($status = null)
+	// {
+	// 	$admin = auth()->user();
+
+	// 	// Get all users (customers) for this admin
+	// 	$customerIds = \App\Models\User::where('parent_admin_id', $admin->id)->pluck('id');
+
+	// 	$ordersQuery = Order::with(['user', 'items.product'])
+	// 		->whereIn('user_id', $customerIds);
+
+	// 	if ($status && strtolower($status) !== 'all') {
+	// 		$ordersQuery->where('status', $status);
+	// 	}
+
+	// 	$orders = $ordersQuery->get();
+
+	// 	return $orders->groupBy('user_id')->map(function ($orders, $userId) {
+	// 		$user = $orders->first()->user;
+	// 		return [
+	// 			'customer' => [
+	// 				'id' => $user->id,
+	// 				'name' => $user->name,
+	// 				'email' => $user->email,
+	// 				'phone' => $user->phone,
+	// 			],
+	// 			'orders' => $orders->map(function ($order) {
+	// 				$itemsSummary = $order->items->map(function ($item) {
+	// 					$productName = $item->product->name ?? 'Product';
+	// 					return $productName . ' × ' . $item->qty;
+	// 				})->implode(', ');
+
+	// 				return [
+	// 					'id' => $order->id,
+	// 					'order_number' => $order->order_number,
+	// 					'customer_name' => $order->user->name,
+	// 					'items_summary' => $itemsSummary,
+	// 					'delivery_date' => $order->delivery_date ? \Carbon\Carbon::parse($order->delivery_date)->format('M j, Y') : null,
+	// 					'status' => $order->status,
+	// 					'approve_url' => route('orders.approve', $order->id),
+	// 					'reject_url' => route('orders.reject', $order->id),
+	// 				];
+	// 			})->values(),
+	// 		];
+	// 	})->values();
+	// }
+
 	private function getGroupedOrders($status = null)
 	{
-		$admin = auth()->user();
+		$user = auth()->user();
 
-		// Get all users (customers) for this admin
-		$customerIds = \App\Models\User::where('parent_admin_id', $admin->id)->pluck('id');
+		$ordersQuery = Order::with(['user', 'items.product']);
 
-		$ordersQuery = Order::with(['user', 'items.product'])
-			->whereIn('user_id', $customerIds);
+		if ($user->role === 'admin') {
+
+			// Admin can only see orders of their customers (soft deleted excluded)
+			$customerIds = User::where('parent_admin_id', $user->id)->pluck('id');
+			$ordersQuery->whereIn('user_id', $customerIds);
+		}
+
+		if ($user->role === 'super_admin') {
+			// Super admin can see all orders including soft deleted
+			// so that they can restore if needed
+			$ordersQuery->withTrashed();
+		}
 
 		if ($status && strtolower($status) !== 'all') {
 			$ordersQuery->where('status', $status);
@@ -48,17 +104,19 @@ class OrderManagementController extends Controller
 						'order_number' => $order->order_number,
 						'customer_name' => $order->user->name,
 						'items_summary' => $itemsSummary,
-						'delivery_date' => $order->delivery_date ? \Carbon\Carbon::parse($order->delivery_date)->format('M j, Y') : null,
+						'delivery_date' => $order->delivery_date
+							? \Carbon\Carbon::parse($order->delivery_date)->format('M j, Y')
+							: null,
 						'status' => $order->status,
-						'approve_url' => route('orders.approve', $order->id),
-						'reject_url' => route('orders.reject', $order->id),
+						'deleted_at' => $order->deleted_at, // 👈 Super Admin deleted order চিনবে
 					];
 				})->values(),
 			];
 		})->values();
 	}
 
-	// 📌 GET /api/orders/grouped-by-customer?status=pending
+
+	// GET /api/orders/grouped-by-customer?status=pending
 	public function groupedByCustomer(Request $request)
 	{
 		$status = $request->query('status');
@@ -68,7 +126,7 @@ class OrderManagementController extends Controller
 	}
 
 
-	// 📌 PUT /api/orders/{order}
+	// PUT /api/orders/{order}
 	public function update(Request $request, Order $order)
 	{
 
@@ -137,7 +195,7 @@ class OrderManagementController extends Controller
 	}
 
 
-	// 📌 POST /api/orders/{order}/approve
+	// POST /api/orders/{order}/approve
 	public function approve(Request $request, Order $order)
 	{
 		if ($order->status !== 'pending') {
@@ -166,7 +224,7 @@ class OrderManagementController extends Controller
 		]);
 	}
 
-	// 📌 POST /api/orders/{order}/reject
+	// POST /api/orders/{order}/reject
 	public function reject(Request $request, Order $order)
 	{
 		if ($order->status !== 'pending') {
@@ -188,7 +246,7 @@ class OrderManagementController extends Controller
 		]);
 	}
 
-	// 📌 GET /api/orders/{order}
+	// GET /api/orders/{order}
 	public function show(Request $request, Order $order)
 	{
 		// Ownership check: customer can only view own order
@@ -202,6 +260,24 @@ class OrderManagementController extends Controller
 		return response()->json([
 			'order' => $order
 		]);
+	}
+
+	// DELETE /api/orders/{order}
+	public function destroy(Request $request, Order $order)
+	{
+
+		$user = auth()->user();
+
+		// Only Admin can delete the order
+		if ($user->role !== 'admin') {
+			return response()->json(['message' => 'Unauthorized'], 403);
+		}
+
+		// Here we are using soft delete, so the order is not permanently deleted
+		$order->delete();
+
+		return response()->json(['message' => 'Order deleted successfully']);
+
 	}
 
 }
