@@ -28,6 +28,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
 	// Admin Dashboard route
 	Route::get('/admin/dashboard', [AdminDashboardController::class, 'index']);
+	// Customer delete route (soft delete)
+	Route::delete('/customers/{id}', [AdminDashboardController::class, 'destroy']);
 
 	// Logout route
 	Route::post('/logout', [AuthController::class, 'logout']);
