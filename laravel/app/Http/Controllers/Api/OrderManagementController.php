@@ -262,22 +262,24 @@ class OrderManagementController extends Controller
 		]);
 	}
 
-	// DELETE /api/orders/{order}
-	public function destroy(Request $request, Order $order)
+	// DELETE /api/customers/{customer}/orders
+	public function destroyByCustomer($customerId)
 	{
-
 		$user = auth()->user();
 
-		// Only Admin can delete the order
 		if ($user->role !== 'admin') {
 			return response()->json(['message' => 'Unauthorized'], 403);
 		}
 
-		// Here we are using soft delete, so the order is not permanently deleted
-		$order->delete();
+		// ঐ customer এর সব order soft delete করে দাও
+		$orders = Order::where('user_id', $customerId)->get();
 
-		return response()->json(['message' => 'Order deleted successfully']);
+		foreach ($orders as $order) {
+			$order->delete();
+		}
 
+		return response()->json(['message' => 'All orders for this customer deleted successfully']);
 	}
+
 
 }

@@ -54,9 +54,10 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::get('/orders/grouped-by-customer', [OrderManagementController::class, 'groupedByCustomer']);
 	Route::post('/orders/{order}/approve', [OrderManagementController::class, 'approve'])->name('orders.approve');
 	Route::post('/orders/{order}/reject', [OrderManagementController::class, 'reject'])->name('orders.reject');
-	// Delete order by admin
-	Route::delete('/orders/{order}', [OrderManagementController::class, 'destroy'])
-		->name('orders.destroy');
+
+	// Delete order by admin for each customers (soft delete)
+	Route::delete('/customers/{customer}/orders', [OrderManagementController::class, 'destroyByCustomer']);
+
 
 
 	// Customer fetch single order details
